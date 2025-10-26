@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Login - VIT-AP Emergency Alert</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-image: url(moon2.png);
+    background-size: cover;
+    background-position: center;
+    margin: 0;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  h1{
+    color: #feffff;
+    text-align: center;
+    margin-top: -400px;
+    margin-right: -420px;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    margin-bottom: 40px;
+  }
+  .container {
+    background: #fff;
+    color: #333;
+    padding: 20px 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    width: 320px;
+    text-align: center;
+  }
+  h2 {
+    margin-bottom: 20px;
+  }
+
+  input {
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+  }
+
+  button {
+    background: #1bba28;
+    border: none;
+    padding: 14px;
+    color: white;
+    font-weight: bold;
+    width: 100%;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.3s ease;
+  }
+
+  button:hover {
+    background: #108619;
+  }
+
+  .link {
+    margin-top: 15px;
+    font-size: 14px;
+  }
+
+  .link a {
+    color: #f44336;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  /* Error message styling */
+  .error-message {
+    display: none;
+    color: #b00020;
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: left;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<h1>VITAP EMERGENCY SYSTEM</h1>
+<div class="container">
+  
+  <h2>Login</h2>
+
+  <form id="loginForm" onsubmit="return handleLogin(event)">
+    <input type="email" id="loginEmail" placeholder="Email" required />
+    <input type="password" id="loginPassword" placeholder="Password" required />
+    <div id="errorBox" class="error-message"></div>
+    <button type="submit">Login</button>
+  </form>
+
+  <div class="link">Don't have an account? <a href="signup.html">Sign Up</a></div>
+</div>
+
+<script>
+function showError(message) {
+  const errorBox = document.getElementById('errorBox');
+  errorBox.textContent = message;
+  errorBox.style.display ='flex';
+}
+function clearError() {
+  const errorBox = document.getElementById('errorBox');
+  errorBox.style.display = 'none';
+}
+
+function handleLogin(event) {
+  event.preventDefault();
+  clearError();
+
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+
+  let users = JSON.parse(localStorage.getItem('users') || '{}');
+  
+  if (!users[email]) {
+    showError("User does not exist. Please sign up first.");
+    return false;
+  }
+
+  if (users[email].password !== password) {
+    showError("Incorrect password. Please try again.");
+    return false;
+  }
+
+  // Save logged in user
+  localStorage.setItem('loggedInUser', email);
+
+  // Redirect to alert page
+  window.location.href = 'alert.html';
+  return false;
+}
+</script>
+
+</body>
+</html>
