@@ -3,24 +3,23 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Login - VIT-AP Emergency Alert</title>
+<title>Sign Up - VIT-AP Emergency Alert</title>
 <style>
   body {
     font-family: Arial, sans-serif;
-    background-image: url(moon2.png);
+    background-image: url(moon.png);
     background-size: cover;
-    background-position: center;
-    margin: 0;
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    margin: 0;
   }
   h1{
     color: #feffff;
     text-align: center;
-    margin-top: -400px;
+    margin-top: -500px;
     margin-right: -420px;
     font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     margin-bottom: 40px;
@@ -28,16 +27,14 @@
   .container {
     background: #fff;
     color: #333;
-    padding: 20px 40px;
+    padding: 30px 40px;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     width: 320px;
     text-align: center;
+    position: relative;
+    margin-top: 50px;
   }
-  h2 {
-    margin-bottom: 20px;
-  }
-
   input {
     width: 100%;
     margin: 10px 0;
@@ -46,9 +43,8 @@
     border: 1px solid #ccc;
     font-size: 16px;
   }
-
   button {
-    background: #1bba28;
+    background:#12b828;
     border: none;
     padding: 14px;
     color: white;
@@ -57,92 +53,115 @@
     border-radius: 6px;
     cursor: pointer;
     font-size: 18px;
-    transition: background 0.3s ease;
   }
-
   button:hover {
-    background: #108619;
+    background: #099d24;
   }
-
   .link {
     margin-top: 15px;
     font-size: 14px;
   }
-
   .link a {
     color: #f44336;
     text-decoration: none;
     font-weight: bold;
   }
 
-  /* Error message styling */
-  .error-message {
+  /* Custom Alert Popup */
+  #alertOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
     display: none;
-    color: #b00020;
-    padding: 10px;
-    font-size: 14px;
-    margin-bottom: 10px;
-    text-align: left;
-    animation: fadeIn 0.3s ease-in-out;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
   }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
+  #alertBox {
+    background: white;
+    color: #333;
+    padding: 25px 35px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    max-width: 320px;
+    text-align: center;
+  }
+  #alertBox button {
+    margin-top: 20px;
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  #alertBox button:hover {
+    background: #d32f2f;
   }
 </style>
 </head>
 <body>
 <h1>VITAP EMERGENCY SYSTEM</h1>
 <div class="container">
-  
-  <h2>Login</h2>
-
-  <form id="loginForm" onsubmit="return handleLogin(event)">
-    <input type="email" id="loginEmail" placeholder="Email" required />
-    <input type="password" id="loginPassword" placeholder="Password" required />
-    <div id="errorBox" class="error-message"></div>
-    <button type="submit">Login</button>
+  <h2>Create Account</h2>
+  <form id="signupForm" onsubmit="return handleSignup(event)">
+    <input type="email" id="signupEmail" placeholder="Email" required />
+    <input type="password" id="signupPassword" placeholder="Password" required minlength="6" />
+    <input type="password" id="signupConfirmPassword" placeholder="Confirm Password" required minlength="6" />
+    <button type="submit">Sign Up</button>
   </form>
+  <div class="link">Already have an account? <a href="login.html">Login</a></div>
+</div>
 
-  <div class="link">Don't have an account? <a href="signup.html">Sign Up</a></div>
+<div id="alertOverlay">
+  <div id="alertBox">
+    <p id="alertMessage"></p>
+    <button onclick="closeAlert()">OK</button>
+  </div>
 </div>
 
 <script>
-function showError(message) {
-  const errorBox = document.getElementById('errorBox');
-  errorBox.textContent = message;
-  errorBox.style.display ='flex';
-}
-function clearError() {
-  const errorBox = document.getElementById('errorBox');
-  errorBox.style.display = 'none';
+function showAlert(message) {
+  document.getElementById('alertMessage').innerText = message;
+  document.getElementById('alertOverlay').style.display = 'flex';
 }
 
-function handleLogin(event) {
+function closeAlert() {
+  document.getElementById('alertOverlay').style.display = 'none';
+}
+
+function handleSignup(event) {
   event.preventDefault();
-  clearError();
+  const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+  const password = document.getElementById('signupPassword').value;
+  const confirmPassword = document.getElementById('signupConfirmPassword').value;
 
-  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  const password = document.getElementById('loginPassword').value;
+  if (password !== confirmPassword) {
+    showAlert("Passwords do not match!");
+    return false;
+  }
 
   let users = JSON.parse(localStorage.getItem('users') || '{}');
-  
-  if (!users[email]) {
-    showError("User does not exist. Please sign up first.");
+
+  if (users[email]) {
+    showAlert("User already exists! Please login.");
     return false;
   }
 
-  if (users[email].password !== password) {
-    showError("Incorrect password. Please try again.");
-    return false;
+  users[email] = { password };
+  localStorage.setItem('users', JSON.stringify(users));
+
+  showAlert("Account created successfully! Please login.");
+  document.getElementById('signupForm').reset();
+
+  // Redirect after alert is closed
+  document.querySelector('#alertBox button').onclick = () => {
+    closeAlert();
+    window.location.href = 'login.html';
   }
 
-  // Save logged in user
-  localStorage.setItem('loggedInUser', email);
-
-  // Redirect to alert page
-  window.location.href = 'alert.html';
   return false;
 }
 </script>
